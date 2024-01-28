@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: terraform-declaration-experiment
+  description: Some Experiments With Paramteres Using Terraform Decalration
+spec:
+  type: service
+  owner: service@example.com
+  lifecycle: experimental

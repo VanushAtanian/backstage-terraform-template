@@ -1,0 +1,83 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: terraform-template-experiments
+  title: Terraform Declaration Template
+  description: Some Experiments With Paramteres Using Terraform Decalration
+  tags:
+    - terraform
+    - experiment
+    - parameters
+spec:
+  owner: service@example.com
+  type: service
+
+  parameters:
+    - title: Provide some simple information
+      required:
+        - provider
+        - region
+      properties:
+        provider:
+          title: Cloud Provider
+          type: string
+          description: Choose Cloud Provider (default - aws)
+          default: aws
+          enum:
+            - aws
+            - google
+            - azurerm
+          enumNames:
+            - 'Amazon Web Services (AWS)'
+            - 'Google Cloud Platform (GCP)'
+            - 'Azure Remote Manager (AzureRM)'
+
+        region:
+          title: Region
+          type: string
+          description: The Region In Which Your Resources Will Be Created
+          default: us-west-2
+          enum:
+            - us-west-2
+            - us-west2
+            - usw2
+          enumNames:
+            - 'US West (Oregon)'
+            - 'Los Angeles'
+            - 'Washington'
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    - id: template
+      name: Fetch Skeleton + Template
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          provider: ${{ parameters.provider }}
+          region: ${{ parameters.region }}
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: This is ${{ parameters.filename }} repository
+        repoUrl: ${{ parameters.repoUrl }}
+
+    - id: register
+      name: Register
+      action: debug:log
+      input:
+        message: ${{ steps['publish'].output.remoteUrl }}
